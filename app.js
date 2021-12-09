@@ -3,9 +3,10 @@ import { renderMushroom, renderFriend } from './render-utils.js';
 import { addFriend, findFriendByName } from './data-utils.js';
 
 const friendsEl = document.querySelector('.friends');
-const mushroomsEl = document.querySelectorAll('.mushrooms');
-const addMushroomButton = document.getElementById('add-mushroom');
-const addFriendButton = document.getElementById('add-friend');
+const mushroomsEl = document.querySelector('.mushrooms');
+const addMushroomButton = document.getElementById('add-mushroom-button');
+const addFriendButton = document.getElementById('add-friend-button');
+const friendInputEl = document.getElementById('friend-input');
 // initialize state
 
 let mushroomCount = 3;
@@ -30,8 +31,10 @@ const friendData = [
 ];
 
 function displayFriends() {
+    friendsEl.textContent = '';
+
     for (let friend of friendData) {
-        const friendEl = renderFriend(friendData);
+        const friendEl = renderFriend(friend);
 
         friendEl.addEventListener('click', () => {
             const friendInState = findFriendByName(friend.name, friendData);
@@ -39,11 +42,14 @@ function displayFriends() {
             if (mushroomCount === 0) {
                 alert('no mushrooms left! go forage for some more');
             }
+            if (friend.satisfaction >= 3) {
+                alert('friend is full');
+            }
             if (mushroomCount > 0 && friendInState.satisfaction < 3) {
-                friendInState.happiness++;
-                mushroomCount++;
+                friendInState.satisfaction++;
+                mushroomCount--;
         
-                displayFriends(friendData);
+                displayFriends();
                 displayMushrooms();    
             }
         });
@@ -54,6 +60,8 @@ function displayFriends() {
 
 
 function displayMushrooms() { 
+    mushroomsEl.textContent = '';
+
     for (let i = 0; i < mushroomCount; i++) {
         const mushroomEl = renderMushroom();
 
@@ -63,9 +71,9 @@ function displayMushrooms() {
 
 
 addFriendButton.addEventListener('click', () => {
-    const name = friendInputEl;
+    const name = friendInputEl.value;
 
-    addFriend(name, friendData);
+    addFriend(friendData, name);
 
     friendInputEl.value = '';
 
@@ -77,11 +85,12 @@ addMushroomButton.addEventListener('click', () => {
     if (Math.random() > .5) {
         alert('found a mushroom!');
 
-        mushroomCount;
+        mushroomCount++;
         displayMushrooms();
     } else {
         alert('no luck!');
     }
+    displayMushrooms();
 });
 
 displayFriends();
